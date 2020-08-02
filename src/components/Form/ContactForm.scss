@@ -1,0 +1,17 @@
+.ContactForm {
+  max-width: 400px;
+  padding: 15px;
+  border: 1px solid black;
+
+  &__item {
+    margin-bottom: 20px;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  &__submit {
+  }
+}

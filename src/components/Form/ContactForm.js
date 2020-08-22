@@ -7,6 +7,7 @@ class ContactForm extends Component {
   state = {
     name: '',
     number: '',
+    showAlert: false,
   };
 
   nameInputId = uuidv4();
@@ -21,16 +22,24 @@ class ContactForm extends Component {
   handleSubmit = e => {
     e.preventDefault();
 
+    const { name, number } = this.state;
+
+    if (!name || !number) {
+      this.setState({ showAlert: true });
+      return;
+    }
+
     this.props.onSubmit(this.state);
 
     this.reset();
   };
 
   reset = () => {
-    this.setState({ name: '', number: '' });
+    this.setState({ name: '', number: '', showAlert: false });
   };
 
   render() {
+    const { showAlert } = this.state;
     return (
       <form className="ContactForm" onSubmit={this.handleSubmit}>
         <div className="ContactForm__item">
@@ -57,6 +66,9 @@ class ContactForm extends Component {
             id={this.phoneInputId}
           />
         </div>
+        {showAlert && (
+          <div className="ContactForm__alert">Please fill the form.</div>
+        )}
         <button className="ContactForm__submit" type="submit">
           Add contact
         </button>

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import Container from '../Container';
+import Container from '../../common/Container';
 import ContactForm from '../Form';
 import Filter from '../Filter';
 import ContactList from '../ContactList';
+import Alert from '../Alert';
 
 class App extends Component {
   state = {
@@ -14,7 +15,26 @@ class App extends Component {
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
+    alertMessage: '',
   };
+
+  componentDidMount() {
+    const contacts = localStorage.getItem('contacts');
+    const parsedContacts = JSON.parse(contacts);
+
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const prevContacts = prevState.contacts;
+    const nextContacts = this.state.contacts;
+
+    if (prevContacts === nextContacts) return;
+
+    localStorage.setItem('contacts', JSON.stringify(nextContacts));
+  }
 
   handleChange = e => {
     this.setState({ filter: e.target.value });
@@ -22,13 +42,13 @@ class App extends Component {
 
   addContact = ({ name, number }) => {
     this.setState(prevState => {
-      const isName =
+      const isNameExist =
         prevState.contacts.find(item => item.name === name) !== undefined;
 
-      isName && alert(`${name} is already in contacts.`);
-
-      return isName
-        ? prevState
+      return isNameExist
+        ? {
+            alertMessage: `${name} is already in contacts.`,
+          }
         : {
             contacts: [
               ...prevState.contacts,
@@ -44,6 +64,12 @@ class App extends Component {
     }));
   };
 
+  toggleModal = () => {
+    this.setState(({ alertMessage }) => ({
+      alertMessage: !alertMessage,
+    }));
+  };
+
   render() {
     const contacts = this.state.contacts.filter(item =>
       item.name.toLowerCase().includes(this.state.filter.toLowerCase()),
@@ -56,6 +82,10 @@ class App extends Component {
         <h2>Contacts</h2>
         <Filter filter={this.state.filter} onChange={this.handleChange} />
         <ContactList contacts={contacts} onDelete={this.deleteContact} />
+
+        {this.state.alertMessage && (
+          <Alert onClose={this.toggleModal}>{this.state.alertMessage}</Alert>
+        )}
       </Container>
     );
   }
